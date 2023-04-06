@@ -1,0 +1,21 @@
+{
+  "name": "Hello Extensions",
+  "description": "Base Level Extension",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_title": "Hello Martin",
+    "default_popup": "popup/popup.html",
+    "default_icon": "imgs/gelbooru_bot.png"
+  },
+  "permissions": [
+    "tabGroups",
+    "activeTab",
+    "tabs",
+    "downloads"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ]
+}
