@@ -1,21 +1,38 @@
 {
-  "name": "Hello Extensions",
-  "description": "Base Level Extension",
-  "version": "1.0",
-  "manifest_version": 3,
-  "action": {
-    "default_title": "Hello Martin",
-    "default_popup": "popup/popup.html",
-    "default_icon": "imgs/gelbooru_bot.png"
-  },
-  "permissions": [
-    "tabGroups",
-    "activeTab",
-    "tabs",
-    "downloads"
-  ],
-  "host_permissions": [
-    "http://*/*",
-    "https://*/*"
-  ]
+    "name": "Hello Extensions",
+    "description": "Base Level Extension",
+    "version": "1.0",
+    "manifest_version": 3,
+    "icons": {
+        "16": "imgs/gelbooru_bot16.png",
+        "32": "imgs/gelbooru_bot32.png",
+        "48": "imgs/gelbooru_bot48.png",
+        "128": "imgs/gelbooru_bot128.png"
+      },
+    "action": {
+        "default_title": "Hello Martin",
+        "default_popup": "popup/popup.html",
+        "default_icon": "imgs/gelbooru_bot16.png"
+    },
+    "permissions": [
+        "tabGroups",
+        "activeTab",
+        "tabs",
+        "downloads",
+        "scripting"
+    ],
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
+    "content_scripts": [
+        {
+            "matches": ["https://*/*"],
+            "css": ["static_inject/static_inject.css"],
+            "js": ["static_inject/static_inject.js"]
+        }
+    ],
+    "background": {
+    "service_worker": "background.js"
+    }
 }
