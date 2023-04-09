@@ -27,12 +27,12 @@
     ],
     "content_scripts": [
         {
-            "matches": ["https://*/*"],
-            "css": ["static_inject/static_inject.css"],
-            "js": ["static_inject/static_inject.js"]
+            "matches": ["https://www.pornhub.com/*"],
+            "css": ["static_inject/pornhub.css"],
+            "js": ["static_inject/pornhub.js"]
         }
     ],
     "background": {
-    "service_worker": "background.js"
+        "service_worker": "background.js"
     }
 }

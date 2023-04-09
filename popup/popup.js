@@ -1,6 +1,3 @@
-console.log('This is a popup!');
-
-
 async function getCurrentTab() {
     let queryOptions = { active: true, lastFocusedWindow: true };
     // `tab` will either be a `tabs.Tab` instance or `undefined`.
@@ -8,15 +5,7 @@ async function getCurrentTab() {
     return tab;
 }
 
-function getImgUrl() {
-    var xpath = "//a[text()='Original image']";
-    var matchingElement = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-    var link = matchingElement.getAttribute('href');
-    return link;
-}
-
 async function executeScript() {
-    console.log("yes");
     var tab = await getCurrentTab();
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
@@ -32,14 +21,15 @@ async function main() {
 
     chrome.tabs.create({url: url});
 
-    var img_button = document.getElementById("img_url_button");
-    img_button.addEventListener(
-    "click", () => executeScript(), false);
 }
 
-// main();
+//main();
 
 var alert_button = document.getElementById("alert_button");
 alert_button.addEventListener(
 "click", () => alert("hello, extensions."), false);
 
+
+var img_button = document.getElementById("img_url_button");
+img_button.addEventListener(
+"click", () => executeScript(), false);
