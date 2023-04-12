@@ -6,21 +6,44 @@ async function getCurrentTab() {
     return tab;
 }
 
-// changes current tab url to be the `<a>Original image</a>` url
-async function openImage() {
-    var tab = await getCurrentTab();
+function getAllTabs() {
+    let tabs = chrome.tabs.query();
 
+    return tabs;
+}
+
+// changes current tab url to be the `<a>Original image</a>` url
+async function openImage(tabs) {
+    tabs.forEach((tab) =>
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ["pogramming_inject/originalImage.js"]
+    })
+    )
+}
+
+function changeFocusBack() {
+    chrome.tabs.query({ currentWindow: true }, (tabsArray) => {
+    if (tabsArray.length === 1) return;
+
+    let activeTabIndex = null;
+    tabsArray.forEach((tab, index) => {
+        if (tab.active === true) {
+            activeTabIndex = index;
+    }
+    });
+
+    const nextTab = tabsArray[(activeTabIndex - 1) % tabsArray.length];
+
+    chrome.tabs.update(nextTab.id, { active: true });
     });
 }
 
 // downloads from the source of current tab url
 async function download() {
-    var tab = await getCurrentTab();
+    let tab = await getCurrentTab();
 
-    var url = tab.url;
+    let url = tab.url;
 
     chrome.downloads.download({
         url: url,
@@ -29,39 +52,33 @@ async function download() {
 }
 
 async function close() {
-    var tab = await getCurrentTab();
+    let tab = await getCurrentTab();
 
     chrome.tabs.remove(
         tab.id
     );
 }
 
+let first_tabs = [];
+let second_tabs = [];
+
 chrome.commands.onCommand.addListener((command) => {
-    if (command == "open-Original-image") {
-        openImage();
 
-        chrome.tabs.query({ currentWindow: true }, (tabsArray) => {
-        if (tabsArray.length === 1) return;
+    switch (command) {
+        case "open-Original-image":
+            second_tabs = getAllTabs();
+            let new_tabs = second_tabs.filter(x => !first_tabs.includes(x));
+            openImage(new_tabs);
+            changeFocusBack();
+            break;
 
-        let activeTabIndex = null;
-        tabsArray.forEach((tab, index) => {
-            if (tab.active === true) {
-                activeTabIndex = index;
-        }
-        });
+        case "download":
+            download();
+            close();
+            break;
 
-        const nextTab = tabsArray[(activeTabIndex - 1) % tabsArray.length];
-
-        chrome.tabs.update(nextTab.id, { active: true });
-        });
-    }
-
-    if (command == "download") {
-        download();
-        close();
-    }
-
-    if (command == "close") {
-        close();
+        case "save-open-tabs":
+            first_tabs = getAllTabs();
+            break;
     }
 });

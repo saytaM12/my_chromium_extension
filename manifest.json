@@ -1,6 +1,6 @@
 {
-    "name": "Hello Extensions",
-    "description": "Base Level Extension",
+    "name": "Gelbooru Image Downloader: Get Ultimate Downloads",
+    "description": "Or 'GID GUD' for short",
     "version": "1.0",
     "manifest_version": 3,
     "icons": {
@@ -10,9 +10,8 @@
         "128": "imgs/gelbooru_bot128.png"
       },
     "action": {
-        "default_title": "Hello Martin",
-        "default_popup": "popup/popup.html",
-        "default_icon": "imgs/gelbooru_bot16.png"
+        "default_title": "GID GUD",
+        "default_popup": "popup/popup.html"
     },
     "permissions": [
         "tabGroups",
@@ -24,13 +23,6 @@
     "host_permissions": [
         "http://*/*",
         "https://*/*"
-    ],
-    "content_scripts": [
-        {
-            "matches": ["https://www.pornhub.com/*"],
-            "css": ["static_inject/pornhub.css"],
-            "js": ["static_inject/pornhub.js"]
-        }
     ],
     "background": {
         "service_worker": "background.js"
@@ -47,6 +39,12 @@
                 "windows": "Ctrl+Q"
             },
             "description": "Downloads currently active URL"
+        },
+        "save-open-tabs": {
+            "suggested_key": {
+                "windows": "Ctrl+M"
+            },
+            "description": "saves all open tabs to a list to use later"
         }
     }
 }
