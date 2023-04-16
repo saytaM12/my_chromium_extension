@@ -6,48 +6,43 @@ async function getCurrentTab() {
     return tab;
 }
 
-function getAllTabs() {
-    let tabs = chrome.tabs.query();
+async function getAllTabs() {
+    let tabs = await chrome.tabs.query({});
 
     return tabs;
 }
 
 // changes current tab url to be the `<a>Original image</a>` url
-async function openImage(tabs) {
-    tabs.forEach((tab) =>
+async function openImages(tabs) {
+    tabs.forEach((tab) => {
+        chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ["pogramming_inject/originalImage.js"]
+        });
+    });
+}
+
+async function openImage(tab) {
     chrome.scripting.executeScript({
         target: { tabId: tab.id },
         files: ["pogramming_inject/originalImage.js"]
-    })
-    )
-}
-
-function changeFocusBack() {
-    chrome.tabs.query({ currentWindow: true }, (tabsArray) => {
-    if (tabsArray.length === 1) return;
-
-    let activeTabIndex = null;
-    tabsArray.forEach((tab, index) => {
-        if (tab.active === true) {
-            activeTabIndex = index;
-    }
-    });
-
-    const nextTab = tabsArray[(activeTabIndex - 1) % tabsArray.length];
-
-    chrome.tabs.update(nextTab.id, { active: true });
     });
 }
+
 
 // downloads from the source of current tab url
-async function download() {
-    let tab = await getCurrentTab();
+async function downloadAll() {
+    let tabs = await getAllTabs();
 
-    let url = tab.url;
-
-    chrome.downloads.download({
-        url: url,
-        filename: "culture/" + url.substring(url.lastIndexOf('/')+1)
+    tabs.forEach((tab) => {
+        if (tab.url.includes("https://img3.gelbooru.com/images/")) {
+            url = tab.url;
+            chrome.downloads.download({
+                url: url,
+                filename: "culture/" + url.substring(url.lastIndexOf('/')+1)
+            });
+            chrome.tabs.remove( tab.id );
+        }
     });
 }
 
@@ -59,26 +54,69 @@ async function close() {
     );
 }
 
-let first_tabs = [];
-let second_tabs = [];
+let first_tabs;
 
 chrome.commands.onCommand.addListener((command) => {
 
     switch (command) {
-        case "open-Original-image":
-            second_tabs = getAllTabs();
-            let new_tabs = second_tabs.filter(x => !first_tabs.includes(x));
-            openImage(new_tabs);
-            changeFocusBack();
+        case "open-Original-images":
+            let f_tabs_ids;
+            chrome.storage.session.get(["local_tabs"]).then((result) => {
+                f_tabs_ids = result.local_tabs;
+            });
+            let second_tabs = getAllTabs();
+            let new_tabs = [];
+
+            second_tabs.then((s_tabs) => {
+                s_tabs.forEach((tab) => {
+                    if (!f_tabs_ids.includes(tab.id)) {
+                        new_tabs.push(tab);
+                    }
+                });
+                chrome.tabs.update(new_tabs[0].id, { active: true } );
+
+                openImages(new_tabs);
+            });
+
             break;
 
+        case "open-current-image":
+            let curr_tab = getCurrentTab();
+            curr_tab.then((c_tab) => {
+                openImage(c_tab);
+            });
+
+            let all_tabs = getAllTabs();
+            all_tabs.then((a_tabs) => {
+                a_tabs.forEach((tab) => {
+                    if (tab.active) {
+                        chrome.tabs.update(a_tabs[a_tabs.lastIndexOf(tab) - 1].id, { active: true });
+                    }
+                })
+            })
+            break;
+
+
         case "download":
-            download();
+            downloadAll();
             close();
             break;
 
         case "save-open-tabs":
             first_tabs = getAllTabs();
+            let first_tabs_ids = [];
+            first_tabs.then((f_tabs) => {
+                f_tabs.forEach((tab) => {
+                    first_tabs_ids.push(tab.id);
+                });
+            });
+            console.log(first_tabs_ids);
+
+            chrome.storage.session.set({ local_tabs: first_tabs_ids });
+
+            chrome.storage.session.get(["local_tabs"]).then((result) => {
+                console.log(result.local_tabs);
+            })
             break;
     }
 });

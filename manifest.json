@@ -18,7 +18,9 @@
         "activeTab",
         "tabs",
         "downloads",
-        "scripting"
+        "scripting",
+        "storage",
+        "unlimitedStorage"
     ],
     "host_permissions": [
         "http://*/*",
@@ -28,9 +30,15 @@
         "service_worker": "background.js"
     },
     "commands": {
-        "open-Original-image": {
+        "open-Original-images": {
             "suggested_key": {
                 "windows": "Ctrl+I"
+            },
+            "description": "Replaces all new tabs with link in <a>Original image</a>"
+        },
+        "open-current-image": {
+            "suggested_key": {
+                "windows": "Ctrl+K"
             },
             "description": "Replaces current tab with link in <a>Original image</a>"
         },
