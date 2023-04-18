@@ -61,8 +61,8 @@ chrome.commands.onCommand.addListener((command) => {
     switch (command) {
         case "open-Original-images":
             let f_tabs_ids;
-            chrome.storage.session.get(["local_tabs"]).then((result) => {
-                f_tabs_ids = result.local_tabs;
+            chrome.storage.session.get(["local"]).then((result) => {
+                f_tabs_ids = result.local;
             });
             let second_tabs = getAllTabs();
             let new_tabs = [];
@@ -84,16 +84,16 @@ chrome.commands.onCommand.addListener((command) => {
             let curr_tab = getCurrentTab();
             curr_tab.then((c_tab) => {
                 openImage(c_tab);
-            });
 
-            let all_tabs = getAllTabs();
-            all_tabs.then((a_tabs) => {
-                a_tabs.forEach((tab) => {
-                    if (tab.active) {
-                        chrome.tabs.update(a_tabs[a_tabs.lastIndexOf(tab) - 1].id, { active: true });
-                    }
-                })
-            })
+                let all_tabs = getAllTabs();
+                all_tabs.then((a_tabs) => {
+                    a_tabs.forEach((tab) => {
+                        if (tab.id == c_tab.id) {
+                            chrome.tabs.update(a_tabs[a_tabs.lastIndexOf(tab) - 1].id, { active: true });
+                        }
+                    });
+                });
+            });
             break;
 
 
@@ -104,19 +104,17 @@ chrome.commands.onCommand.addListener((command) => {
 
         case "save-open-tabs":
             first_tabs = getAllTabs();
-            let first_tabs_ids = [];
+            let first_tabs_ids = [1];
             first_tabs.then((f_tabs) => {
                 f_tabs.forEach((tab) => {
                     first_tabs_ids.push(tab.id);
                 });
+
+                chrome.storage.session.set({local: first_tabs_ids}, function() {
+                    console.log('Array stored in session storage');
+                });
             });
-            console.log(first_tabs_ids);
 
-            chrome.storage.session.set({ local_tabs: first_tabs_ids });
-
-            chrome.storage.session.get(["local_tabs"]).then((result) => {
-                console.log(result.local_tabs);
-            })
             break;
     }
 });
