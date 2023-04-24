@@ -36,23 +36,23 @@
             },
             "description": "Replaces all new tabs with link in <a>Original image</a>"
         },
-        "open-current-image": {
-            "suggested_key": {
-                "windows": "Ctrl+K"
-            },
-            "description": "Replaces current tab with link in <a>Original image</a>"
-        },
         "download": {
             "suggested_key": {
                 "windows": "Ctrl+Q"
             },
-            "description": "Downloads currently active URL"
+            "description": "Downloads all tabs opened which are just images"
         },
         "save-open-tabs": {
             "suggested_key": {
                 "windows": "Ctrl+M"
             },
             "description": "saves all open tabs to a list to use later"
+        },
+        "open-current-artist": {
+            "suggested_key": {
+                "windows": "Ctrl+O"
+            },
+            "description": "Replaces current tab with link in <li class='tag-type-artist'><a></a></li>"
         }
     }
 }
