@@ -29,17 +29,46 @@ function openArtist(tab) {
 // downloads from the source of current tab url
 async function downloadAll() {
     let tabs = await getAllTabs();
+    let file;
+    let url;
+    let download = false;
 
     tabs.forEach((tab) => {
+        url = tab.url;
         if (tab.url.includes("https://img3.gelbooru.com/images/")) {
-            url = tab.url;
+            download = true;
+            file = "culture/" + url.substring(url.lastIndexOf('/')+1);
+        }
+        else if (tab.url.includes("https://wimg.rule34.xxx//images/")) {
+            download = true;
+            file = "culture/" + url.substring(url.lastIndexOf('/')+1, url.indexOf('?'));
+        }
+        else if (tab.url.includes("https://lolibooru.moe/image/")) {
+            download = true;
+            file = url.substring(28);
+            file = file.substring(0, file.indexOf('/'));
+            file += url.substring(url.lastIndexOf('.'));
+            file = "culture/" + file;
+        }
+        else if (tab.url.includes("https://files.yande.re/")) {
+            download = true;
+            file = url.substring(23);
+            file = file.substring(file.indexOf('/')+1);
+            file = file.substring(0, file.indexOf('/'));
+            file += url.substring(url.lastIndexOf('.'));
+            file = "culture/" + file;
+        }
+        if (download) {
             chrome.downloads.download({
                 url: url,
-                filename: "culture/" + url.substring(url.lastIndexOf('/')+1)
+                filename: file
             });
             chrome.tabs.remove( tab.id );
         }
+        download = false;
+        return;
     });
+    await chrome.storage.session.clear();
 }
 
 async function close() {
@@ -63,11 +92,17 @@ async function switchToPrevTab() {
 
 async function openImages() {
     let f_tabs_ids;
+    if (await chrome.storage.session.getBytesInUse() == 0) {
+        let curr_tab = await getCurrentTab();
+        openImage(curr_tab);
+        switchToPrevTab();
+        return;
+    }
+
     await chrome.storage.session.get(["local"]).then((result) => {
         f_tabs_ids = result.local;
     });
 
-    console.log(f_tabs_ids);
     let second_tabs = await getAllTabs();
     let new_tabs = [];
 
@@ -75,7 +110,6 @@ async function openImages() {
         if (!f_tabs_ids.includes(tab.id)) {
             new_tabs.push(tab);
         }
-
     });
 
     chrome.tabs.update(new_tabs[0].id, { active: true } );
@@ -83,8 +117,6 @@ async function openImages() {
     new_tabs.forEach((tab) => {
         openImage(tab);
     });
-
-    await chrome.storage.session.clear();
 }
 
 chrome.commands.onCommand.addListener((command) => {
